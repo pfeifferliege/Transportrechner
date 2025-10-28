@@ -6,11 +6,11 @@
     <title>Taxi Pfeiffer: Transportrechner</title>
     <!-- Tailwind CSS laden -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet (f¸r die Karte) laden -->
+    <!-- Leaflet (f√ºr die Karte) laden -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* Spezifische CSS-Anpassungen f¸r die Karte */
+        /* Spezifische CSS-Anpassungen f√ºr die Karte */
         .map-container {
             height: 400px;
             width: 100%;
@@ -26,7 +26,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
             <h3 id="modalTitle" class="text-xl font-bold text-red-600 mb-3">Fehler</h3>
             <p id="modalMessage" class="text-gray-700 mb-4">Meldung</p>
-            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-150">Schlieﬂen</button>
+            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-150">Schlie√üen</button>
         </div>
     </div>
     
@@ -35,25 +35,66 @@
         <!-- Header und Tabs -->
         <header class="p-6 bg-blue-700 text-white shadow-lg">
             <h1 class="text-3xl font-bold text-center">Taxi Pfeiffer Blankenburg</h1>
-            <p class="text-center mt-1 text-blue-200">Unverbindliche Preiskalkulation f¸r Fahr- und Transportdienste</p>
+            <p class="text-center mt-1 text-blue-200">Unverbindliche Preiskalkulation f√ºr Fahr- und Transportdienste</p>
         </header>
 
         <nav class="flex justify-around bg-blue-600 text-white shadow-md" id="navTabs">
+            <!-- Taxi Rechner an erster Stelle -->
+            <button id="tab-taxi" onclick="showTab('taxi')" class="tab-button w-full py-3 px-2 text-center text-sm sm:text-base font-semibold border-b-4 border-transparent hover:bg-blue-700 transition duration-150 ease-in-out">
+                Taxi Rechner
+            </button>
             <button id="tab-tragestuhl" onclick="showTab('tragestuhl')" class="tab-button w-full py-3 px-2 text-center text-sm sm:text-base font-semibold border-b-4 border-transparent hover:bg-blue-700 transition duration-150 ease-in-out">
                 Tragestuhl
             </button>
             <button id="tab-liegend" onclick="showTab('liegend')" class="tab-button w-full py-3 px-2 text-center text-sm sm:text-base font-semibold border-b-4 border-transparent hover:bg-blue-700 transition duration-150 ease-in-out">
                 Liegendtransport
             </button>
-            <button id="tab-taxi" onclick="showTab('taxi')" class="tab-button w-full py-3 px-2 text-center text-sm sm:text-base font-semibold border-b-4 border-transparent hover:bg-blue-700 transition duration-150 ease-in-out">
-                Taxi Rechner
-            </button>
         </nav>
 
         <!-- Hauptinhalt der Rechner -->
         <main class="p-6">
             
-            <!-- 1. Tragestuhl Rechner -->
+            <!-- 1. Taxi Rechner (Jetzt der erste Tab) -->
+            <div id="taxi" class="tab-content hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">Taxi Rechner</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="startTaxi" class="block text-sm font-medium text-gray-700">Startadresse *</label>
+                        <input type="text" id="startTaxi" placeholder="Startadresse eingeben" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="zielTaxi" class="block text-sm font-medium text-gray-700">Zieladresse *</label>
+                        <input type="text" id="zielTaxi" placeholder="Zieladresse eingeben" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="datumTaxi" class="block text-sm font-medium text-gray-700">Datum</label>
+                            <input type="date" id="datumTaxi" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="uhrzeitTaxi" class="block text-sm font-medium text-gray-700">Uhrzeit</label>
+                            <input type="time" id="uhrzeitTaxi" value="12:00" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <!-- Wartezeit ist nun OPTIONAL, das * wurde entfernt. Standardwert ist 0. -->
+                        <label for="wartezeitTaxi" class="block text-sm font-medium text-gray-700">Wartezeit (Minuten)</label>
+                        <input type="number" id="wartezeitTaxi" placeholder="Wartezeit in Minuten" min="0" value="0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <button onclick="calculateTaxiPrice()" class="mt-6 w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 ease-in-out">
+                    Preis berechnen
+                </button>
+                
+                <div id="resultsTaxi" class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-inner">
+                    <p class="text-center text-gray-500">Bitte Adressen eingeben und Preis berechnen.</p>
+                </div>
+
+                <div id="mapTaxi" class="map-container"></div>
+            </div>
+
+            <!-- 2. Tragestuhl Rechner -->
             <div id="tragestuhl" class="tab-content hidden">
                 <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">Tragestuhl Rechner</h2>
                 <div class="space-y-4">
@@ -86,19 +127,19 @@
                     <div class="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="gepaeckKleinTragestuhl" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Gep‰ck klein (15,00 Ä)</span>
+                            <span>Gep√§ck klein (15,00 ‚Ç¨)</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="gepaeckGrossTragestuhl" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Gep‰ck groﬂ (30,00 Ä)</span>
+                            <span>Gep√§ck gro√ü (30,00 ‚Ç¨)</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="treppenraupeTragestuhl" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Treppenraupe (30,00 Ä)</span>
+                            <span>Treppenraupe (30,00 ‚Ç¨)</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="firmenRollstuhlTragestuhl" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Firmenrollstuhl (12,00 Ä)</span>
+                            <span>Firmenrollstuhl (12,00 ‚Ç¨)</span>
                         </label>
                     </div>
                 </div>
@@ -114,7 +155,7 @@
                 <div id="mapTragestuhl" class="map-container"></div>
             </div>
 
-            <!-- 2. Liegendtransport Rechner -->
+            <!-- 3. Liegendtransport Rechner -->
             <div id="liegend" class="tab-content hidden">
                 <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">Liegendtransport Rechner</h2>
                 <div class="space-y-4">
@@ -147,19 +188,19 @@
                     <div class="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="gepaeckKleinLiegend" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Gep‰ck klein (15,00 Ä)</span>
+                            <span>Gep√§ck klein (15,00 ‚Ç¨)</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="gepaeckGrossLiegend" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Gep‰ck groﬂ (30,00 Ä)</span>
+                            <span>Gep√§ck gro√ü (30,00 ‚Ç¨)</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="treppenraupeLiegend" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Treppenraupe (30,00 Ä)</span>
+                            <span>Treppenraupe (30,00 ‚Ç¨)</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" id="firmenRollstuhlLiegend" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span>Firmenrollstuhl (12,00 Ä)</span>
+                            <span>Firmenrollstuhl (12,00 ‚Ç¨)</span>
                         </label>
                     </div>
                 </div>
@@ -173,45 +214,6 @@
                 </div>
 
                 <div id="mapLiegend" class="map-container"></div>
-            </div>
-
-            <!-- 3. Taxi Rechner -->
-            <div id="taxi" class="tab-content hidden">
-                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">Taxi Rechner</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label for="startTaxi" class="block text-sm font-medium text-gray-700">Startadresse *</label>
-                        <input type="text" id="startTaxi" placeholder="Startadresse eingeben" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="zielTaxi" class="block text-sm font-medium text-gray-700">Zieladresse *</label>
-                        <input type="text" id="zielTaxi" placeholder="Zieladresse eingeben" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="datumTaxi" class="block text-sm font-medium text-gray-700">Datum</label>
-                            <input type="date" id="datumTaxi" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label for="uhrzeitTaxi" class="block text-sm font-medium text-gray-700">Uhrzeit</label>
-                            <input type="time" id="uhrzeitTaxi" value="12:00" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="wartezeitTaxi" class="block text-sm font-medium text-gray-700">Wartezeit (Minuten) *</label>
-                        <input type="number" id="wartezeitTaxi" placeholder="Wartezeit in Minuten" min="0" value="0" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                </div>
-
-                <button onclick="calculateTaxiPrice()" class="mt-6 w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 ease-in-out">
-                    Preis berechnen
-                </button>
-                
-                <div id="resultsTaxi" class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-inner">
-                    <p class="text-center text-gray-500">Bitte Adressen eingeben und Preis berechnen.</p>
-                </div>
-
-                <div id="mapTaxi" class="map-container"></div>
             </div>
             
         </main>
@@ -230,9 +232,9 @@
     <script>
         // --- Globale Konstanten und Konfigurationen ---
         const API_KEY = "A2lRfHWgDIYXh9QObZJTvb17TdUG3CNn";
-        const BETRIEBSHOF = "Westerh‰user Landstraﬂe 17, 38889 Blankenburg";
+        const BETRIEBSHOF = "Westerh√§user Landstra√üe 17, 38889 Blankenburg";
         
-        // Preise f¸r Tragestuhl & Liegendtransport (identisch im Originalcode)
+        // Preise f√ºr Tragestuhl & Liegendtransport (identisch im Originalcode)
         const TS_LT_CONSTANTS = {
             grundgebuehr: 20.00,
             anfahrtskosten: 2.00,
@@ -247,19 +249,22 @@
         const TS_KM_PREIS = 2.50; // Tragestuhl
         const LT_KM_PREIS = 5.00; // Liegendtransport
 
-        // Preise f¸r Taxi Rechner
+        // Preise f√ºr Taxi Rechner (AKTUALISIERT NACH KORREKTURVORGABE)
         const TAXI_CONSTANTS = {
-            grundgebuehrTag: 3.50,
-            grundgebuehrNacht: 4.50,
-            kmPreisTag: 2.20,
-            kmPreisNacht: 2.50,
-            warteMinutenPreis: 0.80, // Umgerechnet von 48Ä pro Stunde (48/60)
-            warteStundePreis: 48.00 // Originalwert
+            grundgebuehrBasis: 4.20,
+            nachtZuschlag: 1.50, // Nachtzuschlag (22.00 Uhr - 06.00 Uhr) auf die Grundgeb√ºhr
+            kmPreisTier1: 3.60, // Kilometer 1 - 5
+            kmPreisTier2: 2.60, // Kilometer 6 - 25
+            kmPreisTier3: 2.40, // Jeder weitere Kilometer (ab 26)
+            warteMinutenPreis: 0.75, // Umgerechnet von 45,00 ‚Ç¨ pro Stunde (45/60)
+            warteStundePreis: 45.00, // Originalwert
+            anfahrtPauschaleKmPreis: 1.50 // F√ºr Fahrten, die nicht in Blankenburg beginnen UND enden
         };
 
-        // --- Globale Variablen f¸r Karten und Zustand ---
+        // --- Globale Variablen f√ºr Karten und Zustand ---
         let maps = {};
-        let activeTab = 'tragestuhl';
+        // Starte mit 'taxi' als aktivem Tab
+        let activeTab = 'taxi';
         const tabConfigs = {
             tragestuhl: { mapId: 'mapTragestuhl', resultId: 'resultsTragestuhl', kmPreis: TS_KM_PREIS, service: 'Tragestuhl' },
             liegend: { mapId: 'mapLiegend', resultId: 'resultsLiegend', kmPreis: LT_KM_PREIS, service: 'Liegendtransport' },
@@ -275,7 +280,7 @@
             document.getElementById('modal').classList.remove('hidden');
         }
         
-        /** F¸hrt einen TomTom API Fetch mit Exponential Backoff durch */
+        /** F√ºhrt einen TomTom API Fetch mit Exponential Backoff durch */
         async function fetchWithRetry(url, maxRetries = 3) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -290,18 +295,31 @@
             }
         }
 
-        /** Geocodierung einer Adresse */
+        /** Geocodierung einer Adresse - gibt Position UND Ort f√ºr die Pr√ºfung zur√ºck */
         async function geocode(address) {
             const url = `https://api.tomtom.com/search/2/geocode/${encodeURIComponent(address)}.json?key=${API_KEY}`;
             const data = await fetchWithRetry(url);
             if (!data.results || data.results.length === 0) {
                 throw new Error(`Adresse nicht gefunden: ${address}`);
             }
-            return data.results[0].position;
+            const result = data.results[0];
+            return {
+                position: result.position,
+                municipality: result.address.municipality || '', // Ort/Gemeinde f√ºr Standortpr√ºfung
+                freeformAddress: result.address.freeformAddress || address
+            };
+        }
+        
+        /** Pr√ºft vereinfacht, ob der Ort Blankenburg (Harz) ist */
+        function isBlankenburg(municipality) {
+            if (!municipality) return false;
+            // Vereinfachte Pr√ºfung auf Blankenburg (Harz)
+            return municipality.toLowerCase().includes('blankenburg');
         }
 
         /** Berechnung der Route und Distanz zwischen zwei Punkten */
         async function calculateRoute(startCoords, endCoords) {
+            // TomTom verwendet lat,lon
             const url = `https://api.tomtom.com/routing/1/calculateRoute/${startCoords.lat},${startCoords.lon}:${endCoords.lat},${endCoords.lon}/json?key=${API_KEY}`;
             const data = await fetchWithRetry(url);
             
@@ -318,15 +336,15 @@
         function updateMap(mapInstance, points) {
             // Alte Layer entfernen
             mapInstance.eachLayer(layer => {
-                if (layer instanceof L.Polyline) {
+                if (layer instanceof L.Polyline || layer instanceof L.Marker) {
                     mapInstance.removeLayer(layer);
                 }
             });
 
-            // Neue Route hinzuf¸gen
+            // Neue Route hinzuf√ºgen
             const polyline = L.polyline(points, { color: '#0078d7', weight: 4 }).addTo(mapInstance);
             
-            // Marker f¸r Start und Ziel hinzuf¸gen
+            // Marker f√ºr Start und Ziel hinzuf√ºgen
             const startMarker = L.marker(points[0]).addTo(mapInstance);
             const zielMarker = L.marker(points[points.length - 1]).addTo(mapInstance);
             startMarker.bindPopup("Start").openPopup();
@@ -336,7 +354,7 @@
             mapInstance.fitBounds(polyline.getBounds(), { padding: [50, 50] });
         }
         
-        // --- Kernlogik f¸r Tragestuhl und Liegendtransport (‰hnliche Logik) ---
+        // --- Kernlogik f√ºr Tragestuhl und Liegendtransport (√§hnliche Logik) ---
         async function calculateTSLTPrice(serviceType) {
             const config = tabConfigs[serviceType];
             const resultElement = document.getElementById(config.resultId);
@@ -360,15 +378,16 @@
 
             try {
                 // 1. Geocodierung
-                const [startCoords, zielCoords, betriebshofCoords] = await Promise.all([
-                    geocode(start),
-                    geocode(ziel),
+                // Beim TSLT brauchen wir nur die Positionen, nicht die Municipality
+                const [startCoords, zielCoords, betriebshofDetails] = await Promise.all([
+                    geocode(start).then(d => d.position),
+                    geocode(ziel).then(d => d.position),
                     geocode(BETRIEBSHOF)
                 ]);
 
                 // 2. Routenberechnung
                 const [anfahrtRoute, streckeRoute] = await Promise.all([
-                    calculateRoute(betriebshofCoords, startCoords),
+                    calculateRoute(betriebshofDetails.position, startCoords),
                     calculateRoute(startCoords, zielCoords)
                 ]);
                 
@@ -382,24 +401,24 @@
                 // Anfahrt (vom Betriebshof zum Start)
                 const anfahrtKosten = anfahrtKm * TS_LT_CONSTANTS.anfahrtskosten;
                 total += anfahrtKosten;
-                breakdown += `<p><b>Grundgeb¸hr:</b> ${TS_LT_CONSTANTS.grundgebuehr.toFixed(2)} Ä</p>`;
-                breakdown += `<p><b>Anfahrt (${anfahrtKm.toFixed(1)} km x ${TS_LT_CONSTANTS.anfahrtskosten.toFixed(2)} Ä):</b> ${anfahrtKosten.toFixed(2)} Ä</p>`;
+                breakdown += `<p><b>Grundgeb√ºhr:</b> ${TS_LT_CONSTANTS.grundgebuehr.toFixed(2)} ‚Ç¨</p>`;
+                breakdown += `<p><b>Anfahrt (${anfahrtKm.toFixed(1)} km x ${TS_LT_CONSTANTS.anfahrtskosten.toFixed(2)} ‚Ç¨):</b> ${anfahrtKosten.toFixed(2)} ‚Ç¨</p>`;
 
                 // Fahrstrecke (vom Start zum Ziel)
                 const streckeKosten = streckeKm * config.kmPreis;
                 total += streckeKosten;
-                breakdown += `<p><b>Fahrstrecke (${streckeKm.toFixed(1)} km x ${config.kmPreis.toFixed(2)} Ä):</b> ${streckeKosten.toFixed(2)} Ä</p>`;
+                breakdown += `<p><b>Fahrstrecke (${streckeKm.toFixed(1)} km x ${config.kmPreis.toFixed(2)} ‚Ç¨):</b> ${streckeKosten.toFixed(2)} ‚Ç¨</p>`;
                 
                 // Treppen (vom Start zum Ziel)
                 const treppenKosten = treppenanzahl * TS_LT_CONSTANTS.treppenPreis;
                 total += treppenKosten;
-                breakdown += `<p><b>Treppen (${treppenanzahl} x ${TS_LT_CONSTANTS.treppenPreis.toFixed(2)} Ä):</b> ${treppenKosten.toFixed(2)} Ä</p>`;
+                breakdown += `<p><b>Treppen (${treppenanzahl} x ${TS_LT_CONSTANTS.treppenPreis.toFixed(2)} ‚Ç¨):</b> ${treppenKosten.toFixed(2)} ‚Ç¨</p>`;
 
                 // Zusatzleistungen
-                if (gepaeckKlein) { total += TS_LT_CONSTANTS.gepaeckKleinPreis; breakdown += `<p><b>Gep‰ck klein:</b> ${TS_LT_CONSTANTS.gepaeckKleinPreis.toFixed(2)} Ä</p>`; }
-                if (gepaeckGross) { total += TS_LT_CONSTANTS.gepaeckGrossPreis; breakdown += `<p><b>Gep‰ck groﬂ:</b> ${TS_LT_CONSTANTS.gepaeckGrossPreis.toFixed(2)} Ä</p>`; }
-                if (treppenraupe) { total += TS_LT_CONSTANTS.treppenraupePreis; breakdown += `<p><b>Treppenraupe:</b> ${TS_LT_CONSTANTS.treppenraupePreis.toFixed(2)} Ä</p>`; }
-                if (firmenRollstuhl) { total += TS_LT_CONSTANTS.firmenRollstuhlPreis; breakdown += `<p><b>Firmenrollstuhl:</b> ${TS_LT_CONSTANTS.firmenRollstuhlPreis.toFixed(2)} Ä</p>`; }
+                if (gepaeckKlein) { total += TS_LT_CONSTANTS.gepaeckKleinPreis; breakdown += `<p><b>Gep√§ck klein:</b> ${TS_LT_CONSTANTS.gepaeckKleinPreis.toFixed(2)} ‚Ç¨</p>`; }
+                if (gepaeckGross) { total += TS_LT_CONSTANTS.gepaeckGrossPreis; breakdown += `<p><b>Gep√§ck gro√ü:</b> ${TS_LT_CONSTANTS.gepaeckGrossPreis.toFixed(2)} ‚Ç¨</p>`; }
+                if (treppenraupe) { total += TS_LT_CONSTANTS.treppenraupePreis; breakdown += `<p><b>Treppenraupe:</b> ${TS_LT_CONSTANTS.treppenraupePreis.toFixed(2)} ‚Ç¨</p>`; }
+                if (firmenRollstuhl) { total += TS_LT_CONSTANTS.firmenRollstuhlPreis; breakdown += `<p><b>Firmenrollstuhl:</b> ${TS_LT_CONSTANTS.firmenRollstuhlPreis.toFixed(2)} ‚Ç¨</p>`; }
                 
                 // 4. Ergebnisse anzeigen
                 let resultHTML = `
@@ -411,8 +430,8 @@
                         <p><b>Zielort:</b> ${zielort}</p>
                         <div class="mt-3 border-t pt-2">
                             ${breakdown}
-                            <p class="mt-2 text-xl font-extrabold text-green-700">Gesamtpreis: ${total.toFixed(2)} Ä</p>
-                            <p class="text-xs text-gray-500 mt-1">Streckenl‰nge: ${streckeKm.toFixed(1)} km</p>
+                            <p class="mt-2 text-xl font-extrabold text-green-700">Gesamtpreis: ${total.toFixed(2)} ‚Ç¨</p>
+                            <p class="text-xs text-gray-500 mt-1">Streckenl√§nge: ${streckeKm.toFixed(1)} km</p>
                         </div>
                     </div>
                 `;
@@ -435,7 +454,7 @@
             calculateTSLTPrice('liegend');
         }
 
-        // --- Kernlogik f¸r Taxi Rechner ---
+        // --- Kernlogik f√ºr Taxi Rechner ---
         async function calculateTaxiPrice() {
             const resultElement = document.getElementById('resultsTaxi');
             resultElement.innerHTML = `<p class="text-center text-blue-600 font-semibold animate-pulse">Route wird berechnet...</p>`;
@@ -444,7 +463,8 @@
             const ziel = document.getElementById('zielTaxi').value;
             const datum = document.getElementById('datumTaxi').value;
             const uhrzeit = document.getElementById('uhrzeitTaxi').value;
-            const wartezeitMinuten = parseInt(document.getElementById('wartezeitTaxi').value) || 0;
+            // Wartezeit ist optional und defaultet zu 0
+            const wartezeitMinuten = parseInt(document.getElementById('wartezeitTaxi').value) || 0; 
 
             if (!start || !ziel) {
                 showModal("Eingabefehler", "Bitte geben Sie eine Start- und Zieladresse ein.");
@@ -453,58 +473,125 @@
             }
 
             try {
-                // 1. Geocodierung und Routenberechnung
-                const startCoords = await geocode(start);
-                const zielCoords = await geocode(ziel);
-                const streckeRoute = await calculateRoute(startCoords, zielCoords);
+                // 1. Geocodierung und Routenberechnung der Hauptstrecke
+                const [startDetails, zielDetails] = await Promise.all([
+                    geocode(start),
+                    geocode(ziel)
+                ]);
+                
+                const streckeRoute = await calculateRoute(startDetails.position, zielDetails.position);
                 const streckeKm = streckeRoute.km;
 
-                // 2. Tages- / Nachttarif bestimmen
-                let isNightTariff = false;
-                const hour = parseInt(uhrzeit.split(':')[0]);
+                // 2. Anfahrtspauschale pr√ºfen und berechnen
+                const isStartBlankenburg = isBlankenburg(startDetails.municipality);
+                const isZielBlankenburg = isBlankenburg(zielDetails.municipality);
+                
+                let anfahrtPauschaleKosten = 0;
+                let anfahrtPauschaleBreakdown = '';
+                
+                // Anfahrtspauschale gilt, wenn Start UND Ziel NICHT in Blankenburg sind
+                const applyAnfahrtPauschale = !isStartBlankenburg && !isZielBlankenburg;
+
+                if (applyAnfahrtPauschale) {
+                    // Anfahrt (vom Betriebshof zum Start) berechnen
+                    const betriebshofDetails = await geocode(BETRIEBSHOF);
+                    const anfahrtRoute = await calculateRoute(betriebshofDetails.position, startDetails.position);
+                    const anfahrtPauschaleKm = anfahrtRoute.km;
+                    anfahrtPauschaleKosten = anfahrtPauschaleKm * TAXI_CONSTANTS.anfahrtPauschaleKmPreis;
+                    anfahrtPauschaleBreakdown = `<p class="text-sm italic text-red-600"><b>Anfahrtspauschale (${anfahrtPauschaleKm.toFixed(1)} km x ${TAXI_CONSTANTS.anfahrtPauschaleKmPreis.toFixed(2)} ‚Ç¨):</b> ${anfahrtPauschaleKosten.toFixed(2)} ‚Ç¨</p>`;
+                }
+
+                // 3. Grundgeb√ºhr und Nachttarif bestimmen
+                let total = 0;
+                let breakdown = ``;
+                
                 // Nachttarif: 22:00 bis 06:00 Uhr
-                if (hour >= 22 || hour < 6) {
-                    isNightTariff = true;
+                const hour = parseInt(uhrzeit.split(':')[0]);
+                const isNightTariff = (hour >= 22 || hour < 6);
+                
+                let grundgebuehrTotal = TAXI_CONSTANTS.grundgebuehrBasis;
+                let nachtzuschlagKosten = 0;
+
+                // Nachtzuschlag anwenden
+                if (isNightTariff) {
+                    nachtzuschlagKosten = TAXI_CONSTANTS.nachtZuschlag;
+                    grundgebuehrTotal += nachtzuschlagKosten;
                 }
                 
-                const grundgebuehr = isNightTariff ? TAXI_CONSTANTS.grundgebuehrNacht : TAXI_CONSTANTS.grundgebuehrTag;
-                const kmPreis = isNightTariff ? TAXI_CONSTANTS.kmPreisNacht : TAXI_CONSTANTS.kmPreisTag;
-                const tarifText = isNightTariff ? "Nachttarif" : "Tagestarif";
+                // Gesamtkosten
+                total += grundgebuehrTotal;
+                total += anfahrtPauschaleKosten;
+                
+                // Grundgeb√ºhr Breakdown
+                breakdown += `<p><b>Grundgeb√ºhr (Basis):</b> ${TAXI_CONSTANTS.grundgebuehrBasis.toFixed(2)} ‚Ç¨</p>`;
+                if (isNightTariff) {
+                     breakdown += `<p><b>Nachtzuschlag (22:00-06:00 Uhr):</b> ${nachtzuschlagKosten.toFixed(2)} ‚Ç¨</p>`;
+                }
+                breakdown += anfahrtPauschaleBreakdown;
 
-                // 3. Preisberechnung
-                let total = grundgebuehr;
-                let breakdown = ``;
 
-                // Grundgeb¸hr
-                breakdown += `<p><b>Grundgeb¸hr (${tarifText}):</b> ${grundgebuehr.toFixed(2)} Ä</p>`;
+                // 4. Fahrstrecke (Tiered Pricing) berechnen
+                let kmRest = streckeKm;
+                let streckeKosten = 0;
+                let streckeBreakdown = '';
+                
+                // Tier 1: 1 - 5 km
+                const kmTier1 = Math.min(kmRest, 5);
+                if (kmTier1 > 0) {
+                    const kostenTier1 = kmTier1 * TAXI_CONSTANTS.kmPreisTier1;
+                    streckeKosten += kostenTier1;
+                    streckeBreakdown += `<p><b>KM 1 - 5 (${kmTier1.toFixed(1)} km x ${TAXI_CONSTANTS.kmPreisTier1.toFixed(2)} ‚Ç¨):</b> ${kostenTier1.toFixed(2)} ‚Ç¨</p>`;
+                    kmRest -= kmTier1;
+                }
 
-                // Fahrstrecke
-                const streckeKosten = streckeKm * kmPreis;
+                // Tier 2: 6 - 25 km (maximal 20 km)
+                const kmTier2 = Math.min(kmRest, 20); 
+                if (kmTier2 > 0) {
+                    const kostenTier2 = kmTier2 * TAXI_CONSTANTS.kmPreisTier2;
+                    streckeKosten += kostenTier2;
+                    streckeBreakdown += `<p><b>KM 6 - 25 (${kmTier2.toFixed(1)} km x ${TAXI_CONSTANTS.kmPreisTier2.toFixed(2)} ‚Ç¨):</b> ${kostenTier2.toFixed(2)} ‚Ç¨</p>`;
+                    kmRest -= kmTier2;
+                }
+
+                // Tier 3: ab 26 km
+                const kmTier3 = Math.max(0, kmRest);
+                if (kmTier3 > 0) {
+                    const kostenTier3 = kmTier3 * TAXI_CONSTANTS.kmPreisTier3;
+                    streckeKosten += kostenTier3;
+                    streckeBreakdown += `<p><b>Ab KM 26 (${kmTier3.toFixed(1)} km x ${TAXI_CONSTANTS.kmPreisTier3.toFixed(2)} ‚Ç¨):</b> ${kostenTier3.toFixed(2)} ‚Ç¨</p>`;
+                }
+                
                 total += streckeKosten;
-                breakdown += `<p><b>Fahrstrecke (${streckeKm.toFixed(1)} km x ${kmPreis.toFixed(2)} Ä):</b> ${streckeKosten.toFixed(2)} Ä</p>`;
-
-                // Wartezeit
+                
+                // 5. Wartezeit
                 const warteKosten = wartezeitMinuten * TAXI_CONSTANTS.warteMinutenPreis;
                 total += warteKosten;
-                breakdown += `<p><b>Wartezeit (${wartezeitMinuten} Min x ${TAXI_CONSTANTS.warteMinutenPreis.toFixed(2)} Ä/Min):</b> ${warteKosten.toFixed(2)} Ä</p>`;
-
-                // 4. Ergebnisse anzeigen
+                
+                // Wartezeit Breakdown
+                if (wartezeitMinuten > 0) {
+                    breakdown += `<p><b>Wartezeit (${wartezeitMinuten} Min x ${TAXI_CONSTANTS.warteMinutenPreis.toFixed(2)} ‚Ç¨/Min):</b> ${warteKosten.toFixed(2)} ‚Ç¨</p>`;
+                } else {
+                    breakdown += `<p><b>Wartezeit:</b> 0.00 ‚Ç¨</p>`;
+                }
+                
+                // 6. Ergebnisse anzeigen
                 let resultHTML = `
                     <h3 class="text-xl font-bold text-blue-700 mb-3">Unverbindliches Angebot Taxi</h3>
                     <div class="space-y-1 text-left text-gray-700">
-                        <p><b>Datum/Uhrzeit:</b> ${datum} um ${uhrzeit}</p>
-                        <p><b>Startadresse:</b> ${start}</p>
-                        <p><b>Zieladresse:</b> ${ziel}</p>
+                        <p><b>Datum/Uhrzeit:</b> ${datum} um ${uhrzeit} (${isNightTariff ? 'Nachttarif' : 'Tagestarif'})</p>
+                        <p><b>Startadresse:</b> ${startDetails.freeformAddress}</p>
+                        <p><b>Zieladresse:</b> ${zielDetails.freeformAddress}</p>
                         <div class="mt-3 border-t pt-2">
                             ${breakdown}
-                            <p class="mt-2 text-xl font-extrabold text-green-700">Gesamtpreis: ${total.toFixed(2)} Ä</p>
-                            <p class="text-xs text-gray-500 mt-1">Streckenl‰nge: ${streckeKm.toFixed(1)} km</p>
+                            ${streckeBreakdown}
+                            <p class="mt-2 text-xl font-extrabold text-green-700">Gesamtpreis: ${total.toFixed(2)} ‚Ç¨</p>
+                            <p class="text-xs text-gray-500 mt-1">Streckenl√§nge: ${streckeKm.toFixed(1)} km</p>
                         </div>
                     </div>
                 `;
                 resultElement.innerHTML = resultHTML;
 
-                // 5. Karte aktualisieren
+                // 7. Karte aktualisieren
                 updateMap(maps['mapTaxi'], streckeRoute.points);
 
             } catch (error) {
@@ -526,16 +613,14 @@
                 
                 // Nur initialisieren, wenn das Element existiert
                 if (mapElement) {
-                    // Verwenden Sie eine Dummy-Karte, wenn sie nicht sichtbar ist, und wechseln Sie zur echten beim Umschalten.
                     // Leaflet funktioniert am besten, wenn es im sichtbaren DOM initialisiert wird.
-                    // Wir initialisieren die Karten einmal, aber invalidieren sie beim Wechseln.
                     maps[mapId] = L.map(mapId, { attributionControl: false }).setView(defaultView, defaultZoom);
                     L.tileLayer(`https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=${API_KEY}`, {
-                        attribution: '© TomTom',
+                        attribution: '¬© TomTom',
                         maxZoom: 18
                     }).addTo(maps[mapId]);
                     
-                    // Versteckte Karten m¸ssen invalidiert werden, um ihre Grˆﬂe korrekt anzuzeigen
+                    // Versteckte Karten m√ºssen invalidiert werden, um ihre Gr√∂√üe korrekt anzuzeigen
                     if (key !== activeTab) {
                         mapElement.style.visibility = 'hidden';
                     }
@@ -581,7 +666,7 @@
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
             document.querySelectorAll('[id^="results"]').forEach(results => results.innerHTML = `<p class="text-center text-gray-500">Bitte Adressen eingeben und Preis berechnen.</p>`);
             
-            // Karten zur¸cksetzen
+            // Karten zur√ºcksetzen
             for (const mapId in maps) {
                 maps[mapId].eachLayer(layer => {
                     if (layer instanceof L.Polyline || layer instanceof L.Marker) {
@@ -596,7 +681,7 @@
             document.getElementById('uhrzeitTaxi').value = '12:00';
             document.getElementById('wartezeitTaxi').value = '0';
 
-            showModal("Zur¸ckgesetzt", "Alle Formulare wurden geleert.");
+            showModal("Zur√ºckgesetzt", "Alle Formulare wurden geleert.");
         }
 
         /** Druckt das aktuelle Ergebnis */
@@ -652,9 +737,8 @@
             
             // Karten initialisieren und Standard-Tab anzeigen
             initMaps();
-            showTab('tragestuhl');
+            showTab('taxi'); // Starte mit dem Taxi Rechner
         };
     </script>
 </body>
 </html>
-
